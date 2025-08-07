@@ -11,6 +11,7 @@
             <Setter Property="Width" Value="105"/>
             <Setter Property="Height" Value="105"/>
             <Setter Property="Margin" Value="5"/>
+            <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
@@ -30,7 +31,7 @@
             </Setter>
         </Style>
     </UserControl.Resources>
-    <Grid>
+    <Grid Margin="0,0,0,10">
         <Grid.RowDefinitions>
             <!--Close Contact Button-->
             <RowDefinition Height="75"/>
@@ -112,6 +113,16 @@
                     Text="About"/>
                 <TextBlock
                     Text="Available"/>
+
+                <!--Contact Email-->
+                <TextBlock
+                    Margin="0,20,0,0"
+                    HorizontalAlignment="Left"
+                    FontSize="15"
+                    FontWeight="SemiBold"
+                    Text="Contact"/>
+                <TextBlock
+                    Text="abcd@gmail.com"/>
 
             </StackPanel>
         </ScrollViewer>
