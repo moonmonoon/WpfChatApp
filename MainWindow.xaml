@@ -43,8 +43,7 @@
                         Height="40" Width="40">
                         <Ellipse.Fill>
                             <ImageBrush
-                                ImageSource="{Binding ContactPhoto, UpdateSourceTrigger=PropertyChanged,
-                                FallbackValue=/assets/5.jpg, TargetNullValue=/assets/5.jpg}" 
+                                ImageSource="{Binding ContactPhoto, UpdateSourceTrigger=PropertyChanged, FallbackValue='/assets/5.jpg', TargetNullValue='/assets/5.jpg'}" 
                                 Stretch="UniformToFill"/>
 
                         </Ellipse.Fill>
@@ -58,8 +57,7 @@
                                  FontSize="20"/>
                             <LineBreak/>
                             <!--Online status-->
-                            <Run Text="{Binding LastSeen, FallbackValue='Last Seen', TargetNullValue='Last Seen',
-                                                UpdateSourceTrigger=PropertyChanged}"
+                            <Run Text="{Binding LastSeen, FallbackValue='Last Seen', TargetNullValue='Last Seen', UpdateSourceTrigger=PropertyChanged}"
                                  FontSize="15"/>
                         </TextBlock>
                     </Grid>
@@ -265,17 +263,63 @@
                         Content="{StaticResource more}"
                         Style="{StaticResource ToggleIconButtonStyle}"/>
                 </Grid>
+                
                 <!--2.2.Conversation Body-->
                 <customcontrols:Conversation Grid.Row="1"/>
+                
                 <!--2.3.Reply popup-->
                 
                 <!--2.4.Send Message box-->
+                <Grid Grid.Row="3">
+                    <Border
+                        Background="#dce1de"
+                        CornerRadius="15"
+                        Height="50"
+                        Margin="15,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/> <!--Textbox Button-->
+                                <ColumnDefinition Width="Auto"/> <!--Attachment Button & Send Msg Button-->
+                            </Grid.ColumnDefinitions>
 
+                            <TextBox
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Padding="12,0"
+                                Text="{Binding MessageText}"
+                                VerticalAlignment="Stretch"
+                                VerticalContentAlignment="Center"
+                                x:Name="MessageBox">
+                                <!--To-Do: Input Bindings-->
+                                
+                            </TextBox>
+
+                            <StackPanel
+                                Grid.Column="1"
+                                Orientation="Horizontal">
+                                <!--To-Do: Commands-->
+                                <Button
+                                    Content="{StaticResource attach}"
+                                    x:Name="AttachButton"
+                                    Style="{StaticResource IconButtonStyle}"/>
+                                <Button
+                                    Content="{StaticResource send}"
+                                    x:Name="SendMsgButton"
+                                    Style="{StaticResource IconButtonStyle}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    
+                    
+                </Grid>
             </Grid>
 
-
-
             <!--3.Profile Info-->
+            <customcontrols:ContactInfo
+                x:Name="ContactInfoScreen"
+                Grid.Row="1"
+                Grid.Column="2"/>
+
         </Grid>
     </Border>
 </Window>

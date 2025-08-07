@@ -1,0 +1,119 @@
+﻿<UserControl x:Class="WpfChatApp.CustomControls.ContactInfo"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfChatApp.CustomControls"
+             mc:Ignorable="d"
+             MaxWidth="406">
+    <UserControl.Resources>
+        <Style x:Key="MediaButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="105"/>
+            <Setter Property="Height" Value="105"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="10">
+                            <Border.Background>
+                                <ImageBrush
+                                    ImageSource="{Binding Content, 
+                                    RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}"
+                                    Stretch="UniformToFill"/>
+                            </Border.Background>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <!--Close Contact Button-->
+            <RowDefinition Height="75"/>
+            <!--Contact Info & Media-->
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Button
+            Margin="15,0"
+            HorizontalAlignment="Left"
+            Content="{StaticResource close}"
+            Style="{StaticResource IconButtonStyle}"/>
+
+        <ScrollViewer
+            Grid.Row="1"
+            HorizontalScrollBarVisibility="Disabled">
+            <StackPanel
+                Margin="20">
+                <!--To-Do: Open/Close Animation-->
+
+                <!--Profile Photo-->
+                <Ellipse
+                    StrokeThickness="2"
+                    Stroke="#9fa8da"
+                    Width="150"
+                    Height="150"
+                    Stretch="Uniform">
+                    <Ellipse.Fill>
+                        <ImageBrush
+                            ImageSource="{Binding ContactPhoto, FallbackValue='assets/5.jpg', TargetNullValue='assets/5.jpg', UpdateSourceTrigger=PropertyChanged}"
+                            Stretch="UniformToFill"/>
+                    </Ellipse.Fill>
+                </Ellipse>
+                
+                <!--Contact Name-->
+                <TextBlock
+                    Margin="0,20,0,0"
+                    HorizontalAlignment="Center"
+                    FontSize="30"
+                    FontWeight="Bold"
+                    Text="{Binding ContactName, FallbackValue='Contact Name', TargetNullValue='Contact Name', UpdateSourceTrigger=PropertyChanged}"/>
+                
+                <!--Contact Online Status-->
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    Text="{Binding LastSeen, FallbackValue='Last Seen', TargetNullValue='Last Seen', UpdateSourceTrigger=PropertyChanged}"/>
+                
+                <!--Media, Links & Files-->
+                <TextBlock
+                    Margin="0,20,0,0"
+                    HorizontalAlignment="Left"
+                    FontSize="15"
+                    FontWeight="SemiBold"
+                    Text="Media, Links &amp; Files"/>
+
+                <ItemsControl
+                    Margin="0,20,0,0">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <!--To-Do: Add animation-->
+                            <WrapPanel/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <Button Content="/assets/2.jpg" Style="{StaticResource MediaButtonStyle}"/>
+                    <Button Content="/assets/1.png" Style="{StaticResource MediaButtonStyle}"/>
+                    <Button Content="/assets/3.jpg" Style="{StaticResource MediaButtonStyle}"/>
+                    <Button Content="/assets/4.jpg" Style="{StaticResource MediaButtonStyle}"/>
+                    <Button Content="/assets/8.jpg" Style="{StaticResource MediaButtonStyle}"/>
+                    <Button Content="/assets/6.jpg" Style="{StaticResource MediaButtonStyle}"/>
+                </ItemsControl>
+
+                <!--Status & About-->
+                <TextBlock
+                    Margin="0,20,0,0"
+                    HorizontalAlignment="Left"
+                    FontSize="15"
+                    FontWeight="SemiBold"
+                    Text="About"/>
+                <TextBlock
+                    Text="Available"/>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
