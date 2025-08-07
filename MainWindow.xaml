@@ -1,0 +1,281 @@
+﻿<Window x:Class="WpfChatApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfChatApp"
+        xmlns:customcontrols="clr-namespace:WpfChatApp.CustomControls" 
+        xmlns:viewmodels="clr-namespace:WpfChatApp.ViewModels"
+        mc:Ignorable="d"
+        x:Name="mainWindow"
+        AllowsTransparency="True"
+        Background="Transparent"
+        FontSize="15"
+        Height="768" Width="1250"
+        ResizeMode="NoResize"
+        Title="Plastic Talk"
+        WindowStyle="None"
+        WindowStartupLocation="CenterScreen">
+    <Window.DataContext>
+        <viewmodels:ViewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <!--#region - Contact Info Button's Style & Template-->
+        <Style x:Key="ContactInfoButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <ControlTemplate x:Key="ContactInfoButtonTemplate" TargetType="{x:Type Button}">
+            <Border
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}">
+                <Grid VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <!--Profile photo-->
+                        <ColumnDefinition Width="75"/>
+                        <!--Name & Online status-->
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                
+                    <Ellipse
+                        Height="40" Width="40">
+                        <Ellipse.Fill>
+                            <ImageBrush
+                                ImageSource="{Binding ContactPhoto, UpdateSourceTrigger=PropertyChanged,
+                                FallbackValue=/assets/5.jpg, TargetNullValue=/assets/5.jpg}" 
+                                Stretch="UniformToFill"/>
+
+                        </Ellipse.Fill>
+                    </Ellipse>
+
+                    <Grid Grid.Column="1">
+                        <TextBlock>
+                            <!--Name-->
+                            <Run Text="{Binding ContactName, FallbackValue='Contact Name', TargetNullValue='Contact Name', UpdateSourceTrigger=PropertyChanged}"
+                                 FontWeight="Bold"
+                                 FontSize="20"/>
+                            <LineBreak/>
+                            <!--Online status-->
+                            <Run Text="{Binding LastSeen, FallbackValue='Last Seen', TargetNullValue='Last Seen',
+                                                UpdateSourceTrigger=PropertyChanged}"
+                                 FontSize="15"/>
+                        </TextBlock>
+                    </Grid>
+                </Grid>
+            </Border>
+        </ControlTemplate>
+        <!--#endregion-->
+    </Window.Resources>
+    <!-- Structuring MainWindow -->
+    <Border 
+        CornerRadius="20" 
+        Background="WhiteSmoke">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="45"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <!--1.Contact Chat List-->
+                <ColumnDefinition Width="Auto"/>
+                <!--2.Conversation Area-->
+                <ColumnDefinition/>
+                <!--3.Profile Info-->
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!--0.Title Bar-->
+            <Border 
+                CornerRadius="20,20,0,0"
+                Background="#5c6bc0"
+                Grid.ColumnSpan="3"
+                MouseDown="Border_MouseDown">
+                <Grid>
+                    <TextBlock 
+                        Text="{Binding Title, ElementName=mainWindow}"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Margin="15,0"
+                        Foreground="White"
+                        FontSize="20"
+                        FontWeight="Bold"/>
+
+                    <!--Window Buttons-->
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                Margin="10,0">
+                        <Button x:Name="btnMinimize"
+                                Height="20" Width="45"
+                                Content="{StaticResource minimize}"
+                                Click="btnMinimize_Click"
+                                Style="{StaticResource IconButtonStyle}" />
+                        <Button x:Name="btnMaximize"
+                                Height="20" Width="45"
+                                Content="{StaticResource maximize}"
+                                Click="btnMaximize_Click"
+                                Style="{StaticResource IconButtonStyle}" />
+                        <Button x:Name="btnClose"
+                                Height="20" Width="45"
+                                Content="{StaticResource close}"
+                                Foreground="Red"
+                                Click="btnClose_Click"
+                                Style="{StaticResource IconButtonStyle}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!--1.Contact Chat List-->
+            <Grid Grid.Row="1" MinWidth="406">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="323*"/>
+                    <ColumnDefinition Width="84*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <!--1.1.Title & Search Options ...-->
+                    <RowDefinition Height="Auto"/>
+                    <!--1.2.Searchbox-->
+                    <RowDefinition Height="Auto"/>
+                    <!--1.3.Status Thumbs-->
+                    <RowDefinition Height="Auto"/>
+                    <!--1.4.Chats List-->
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <!--1.1.Title & Search Options ...-->
+                <Grid Margin="15,0,15,0"
+                      Height="75" Grid.ColumnSpan="2">
+                    <Grid.ColumnDefinitions>
+                        <!--Title-->
+                        <ColumnDefinition Width="Auto"/>
+                        <!--Blank-->
+                        <ColumnDefinition/>
+                        <!--Search Button-->
+                        <ColumnDefinition Width="40"/>
+                        <!--More Options Button-->
+                        <ColumnDefinition Width="40"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock 
+                        Text="Chats"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        FontSize="20"
+                        FontWeight="SemiBold"/>
+
+                    <!--Search Button-->
+                    <Button 
+                        Grid.Column="2"
+                        x:Name="btnChatSearchButton"
+                        Content="{StaticResource search}"
+                        Style="{StaticResource IconButtonStyle}"/>
+
+                    <!--More Options Popup Menu-->
+                    <ToggleButton 
+                        Grid.Column="3"
+                        x:Name="btnMoreOptions"
+                        Content="{StaticResource more}"
+                        Style="{StaticResource ToggleIconButtonStyle}"/>
+                </Grid>
+
+                <!--1.2.SearchBox-->
+                <!-- To-Do: Add Search Box open/close and hide/unhide Triggers -->
+                <Border Grid.Row="1"
+                    Background="#dce1de"
+                    CornerRadius="15"
+                    Margin="20,20,20,20"
+                    Height="50"
+                    x:Name="searchBoxBorder"
+                    FocusManager.FocusedElement="{Binding ElementName=searchQuery}" Grid.ColumnSpan="2">
+
+                    <!--FocusManager.FocusedElement="{Binding ElementName=searchQuery}"
+                        => to focus our textbox when border gets focused...-->
+                    <TextBox
+                        Name="searchQuery"
+                        Padding="12,0"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        VerticalAlignment="Stretch"
+                        VerticalContentAlignment="Center"
+                        Text="Search Text"
+                        />
+                </Border>
+
+                <!--1.3.Status Thumbs-->
+                <customcontrols:StatusThumbs Grid.Row="2"/>
+
+                <!--1.4.Chats List-->
+                <customcontrols:ChatList Grid.Row="3"/>
+            </Grid>
+
+            <!--2.Conversation Area-->
+            <Grid Grid.Row="1" Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <!--2.1.Conversation Header-->
+                    <RowDefinition Height="Auto"/>
+                    <!--2.2.Conversation Body-->
+                    <RowDefinition/>
+                    <!--2.3.Reply popup-->
+                    <RowDefinition Height="Auto"/>
+                    <!--2.4.Send Message box-->
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <!--2.1.Conversation Header-->
+                <Grid
+                    Height="75"
+                    Margin="0,0,15,0"
+                    VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <!--Contact Info - Header Name & Online Status-->
+                        <ColumnDefinition/>
+                        <!--Video Call button-->
+                        <ColumnDefinition Width="50"/>
+                        <!--Call button-->
+                        <ColumnDefinition Width="50"/>
+                        <!--Search Message button-->
+                        <ColumnDefinition Width="50"/>
+                        <!--More Options-->
+                        <ColumnDefinition Width="50"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!--Contact Info Button-->
+                    <Button Template="{StaticResource ContactInfoButtonTemplate}"
+                            Style="{StaticResource ContactInfoButtonStyle}"/>
+                    
+                    <!--Videocall button-->
+                    <Button Grid.Column="1"
+                            Content="{StaticResource videocall}"
+                            Style="{StaticResource IconButtonStyle}"/>
+                    
+                    <!--Call button-->
+                    <Button Grid.Column="2"
+                            Content="{StaticResource call}"
+                            Style="{StaticResource IconButtonStyle}"/>
+                    
+                    <!--Search button-->
+                    <Button Grid.Column="3"
+                            Content="{StaticResource search}"
+                            Style="{StaticResource IconButtonStyle}"/>
+                    
+                    <!--More Options button-->
+                    <ToggleButton
+                        Grid.Column="4"
+                        Content="{StaticResource more}"
+                        Style="{StaticResource ToggleIconButtonStyle}"/>
+                </Grid>
+                <!--2.2.Conversation Body-->
+                <customcontrols:Conversation Grid.Row="1"/>
+                <!--2.3.Reply popup-->
+                
+                <!--2.4.Send Message box-->
+
+            </Grid>
+
+
+
+            <!--3.Profile Info-->
+        </Grid>
+    </Border>
+</Window>
