@@ -22,6 +22,91 @@ namespace WpfChatApp.ViewModels
         public string ContactName { get; set; }
         public Uri ContactPhoto { get; set; }
         public string LastSeen { get; set; }
+
+        #region Search Chats
+        protected string LastSearchText { get; set; }
+        protected string mSearchText { get; set; }
+        public string SearchText
+        {
+            get => mSearchText;
+            set
+            {
+                //checked if value is different
+                if (mSearchText == value)
+                    return;
+
+                //update value
+                mSearchText = value;
+
+                //if search text is empty restore messages
+                if (string.IsNullOrEmpty(SearchText))
+                    Search();
+            }
+        }
+        #endregion
+        #endregion
+
+        #region Logics
+        public void Search()
+        {
+            //to avoid re-searching same text again
+            if ((string.IsNullOrEmpty(LastSearchText) && string.IsNullOrEmpty(SearchText)) || string.Equals(LastSearchText, SearchText))
+                return;
+
+            if (string.IsNullOrEmpty(SearchText) || Chats == null || Chats.Count <= 0)
+            {
+                FilteredChats = new ObservableCollection<ChatListData>(Chats ?? Enumerable.Empty<ChatListData>());
+                OnPropertyChanged("FilteredChats");
+
+                FilteredPinnedChats = new ObservableCollection<ChatListData>(PinnedChats ?? Enumerable.Empty<ChatListData>());
+                OnPropertyChanged("FilteredPinnedChats");
+
+                //update last search text
+                LastSearchText = SearchText;
+
+                return;
+            }
+
+            //to find all chats that contain the text in our search box
+
+            // if that chat is in Normal Unpinned Chat list find there...
+            FilteredChats = new ObservableCollection<ChatListData>(
+                Chats.Where(
+                    chat => chat.ContactName.ToLower().Contains(SearchText) // if ContactName contains SearchText then add it in filtered chat list
+                            || chat.Message != null && chat.Message.ToLower().Contains(SearchText) // if Message contains SearchText then add it in filtered chat list
+                            )
+                );
+            OnPropertyChanged("FilteredChats");
+
+            // else if not found in Normal Unpinned Chat list, find in pinned chats list
+            FilteredPinnedChats = new ObservableCollection<ChatListData>(
+                PinnedChats.Where(
+                    pinnedChat => pinnedChat.ContactName.ToLower().Contains(SearchText) // if ContactName contains SearchText then add it in filtered chat list
+                            || pinnedChat.Message != null && pinnedChat.Message.ToLower().Contains(SearchText) // if Message contains SearchText then add it in filtered chat list
+                            )
+                );
+            OnPropertyChanged("FilteredPinnedChats");
+
+            //update last search text
+            LastSearchText = SearchText;
+        }
+        #endregion
+
+        #region Commands
+        protected ICommand _searchCommand;
+        public ICommand SearchCommand
+        {
+            get
+            {
+                if (_searchCommand == null)
+                    _searchCommand = new CommandViewModel(Search);
+                return _searchCommand;
+            }
+            set
+            {
+                _searchCommand = value;
+            }
+        }
         #endregion
 
         #endregion
@@ -101,6 +186,7 @@ namespace WpfChatApp.ViewModels
                 //Updating filtered chats to match
                 FilteredChats = new ObservableCollection<ChatListData>(mChats);
                 OnPropertyChanged("Chats");
+                OnPropertyChanged("FilteredChats");
             }
         }
 
@@ -120,6 +206,7 @@ namespace WpfChatApp.ViewModels
                 //Updating filtered pinned chats to match
                 FilteredPinnedChats = new ObservableCollection<ChatListData>(mPinnedChats);
                 OnPropertyChanged("PinnedChats");
+                OnPropertyChanged("FilteredPinnedChats");
             }
         }
 
@@ -218,19 +305,19 @@ namespace WpfChatApp.ViewModels
                     //add selected chat to pin chat
                     PinnedChats.Add(v);
                     FilteredPinnedChats.Add(v);
+                    OnPropertyChanged("PinnedChats");
+                    OnPropertyChanged("FilteredPinnedChats");
                     v.ChatIsPinned = true;
 
                     //remove selected chat from all chats, unpinned chats
                     Chats.Remove(v);
                     FilteredChats.Remove(v);
-
-                    //OnPropertyChanged("PinnedChats");
-                    //OnPropertyChanged("FilteredPinnedChats");
-                    //OnPropertyChanged("Chats");
-                    //OnPropertyChanged("FilteredChats");
+                    OnPropertyChanged("Chats");
+                    OnPropertyChanged("FilteredChats");
                 }
             }
         });
+
         protected ICommand _unPinChatCommand;
         public ICommand UnPinChatCommand => _unPinChatCommand ??= new RelayCommand(parameter =>
         {
@@ -241,16 +328,15 @@ namespace WpfChatApp.ViewModels
                     //add selected chat to Normal Unpinned chat list
                     Chats.Add(v);
                     FilteredChats.Add(v);
+                    OnPropertyChanged("Chats");
+                    OnPropertyChanged("FilteredChats");
 
                     //remove selected pinned chat list
                     PinnedChats.Remove(v);
                     FilteredPinnedChats.Remove(v);
+                    OnPropertyChanged("PinnedChats");
+                    OnPropertyChanged("FilteredPinnedChats");
                     v.ChatIsPinned = false;
-
-                    //OnPropertyChanged("PinnedChats");
-                    //OnPropertyChanged("FilteredPinnedChats");
-                    //OnPropertyChanged("Chats");
-                    //OnPropertyChanged("FilteredChats");
                 }
             }
         });

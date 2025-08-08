@@ -196,8 +196,12 @@
                         BorderThickness="0"
                         VerticalAlignment="Stretch"
                         VerticalContentAlignment="Center"
-                        Text="Search Text"
-                        />
+                        Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}">
+                        <!--key Binding to search on 'Enter' key press-->
+                        <TextBox.InputBindings>
+                            <KeyBinding Command="{Binding SearchCommand}" Key="Return"/>
+                        </TextBox.InputBindings>
+                    </TextBox>
                 </Border>
 
                 <!--1.3.Status Thumbs-->
