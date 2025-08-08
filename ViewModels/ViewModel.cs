@@ -98,9 +98,35 @@ namespace WpfChatApp.ViewModels
                 //To Update the list
                 mChats = value;
 
+                //Updating filtered chats to match
+                FilteredChats = new ObservableCollection<ChatListData>(mChats);
                 OnPropertyChanged("Chats");
             }
         }
+
+        public ObservableCollection<ChatListData> mPinnedChats;
+        public ObservableCollection<ChatListData> PinnedChats
+        {
+            get => mPinnedChats;
+            set
+            {
+                //To Change the list
+                if (mPinnedChats == value)
+                    return;
+
+                //To Update the list
+                mPinnedChats = value;
+
+                //Updating filtered pinned chats to match
+                FilteredPinnedChats = new ObservableCollection<ChatListData>(mPinnedChats);
+                OnPropertyChanged("PinnedChats");
+            }
+        }
+
+
+        //Filtering Chats & Pinned Chats
+        public ObservableCollection<ChatListData> FilteredChats { get; set; }
+        public ObservableCollection<ChatListData> FilteredPinnedChats { get; set; }
 
         #endregion
 
@@ -142,43 +168,93 @@ namespace WpfChatApp.ViewModels
         #region Commands
         // To get the ContactName of selected chat so that we can open corresponding conversation
         protected ICommand _getSelectedChatCommand;
-
         // ??= 구문은 c# 8 이상에서 사용 가능
-        //public ICommand GetSelectedChatCommand => _getSelectedChatCommand ??= new RelayCommand(parameter =>
-        //{
-        //    if (parameter is ChatListData v)
-        //    {
-        //        //getting contactname from selected chat
-        //        ContactName = v.ContactName;
-        //        OnPropertyChanged("ContactName");
-
-        //        //getting contactphoto from selected chat
-        //        ContactPhoto = v.ContactPhoto;
-        //        OnPropertyChanged("ContactPhoto");
-        //    }
-        //});
-        public ICommand GetSelectedChatCommand
+        public ICommand GetSelectedChatCommand => _getSelectedChatCommand ??= new RelayCommand(parameter =>
         {
-            get
+            if (parameter is ChatListData v)
             {
-                if (_getSelectedChatCommand == null)
-                {
-                    _getSelectedChatCommand = new RelayCommand(parameter =>
-                    {
-                        // getting param from selected chat
-                        if (parameter is ChatListData v)
-                        {
-                            ContactName = v.ContactName;
-                            OnPropertyChanged("ContactName");
+                //getting contactname from selected chat
+                ContactName = v.ContactName;
+                OnPropertyChanged("ContactName");
 
-                            ContactPhoto = v.ContactPhoto;
-                            OnPropertyChanged("ContactPhoto");
-                        }
-                    });
-                }
-                return _getSelectedChatCommand;
+                //getting contactphoto from selected chat
+                ContactPhoto = v.ContactPhoto;
+                OnPropertyChanged("ContactPhoto");
             }
-        }
+        });
+        #region - c# 7.3 버전 코드
+        //public ICommand GetSelectedChatCommand
+        //{
+        //    get
+        //    {
+        //        if (_getSelectedChatCommand == null)
+        //        {
+        //            _getSelectedChatCommand = new RelayCommand(parameter =>
+        //            {
+        //                // getting param from selected chat
+        //                if (parameter is ChatListData v)
+        //                {
+        //                    ContactName = v.ContactName;
+        //                    OnPropertyChanged("ContactName");
+
+        //                    ContactPhoto = v.ContactPhoto;
+        //                    OnPropertyChanged("ContactPhoto");
+        //                }
+        //            });
+        //        }
+        //        return _getSelectedChatCommand;
+        //    }
+        //}
+        #endregion
+
+        // To Pin Chat on Pin Button Click
+        protected ICommand _pinChatCommand;
+        public ICommand PinChatCommand => _pinChatCommand ??= new RelayCommand(parameter =>
+        {
+            if (parameter is ChatListData v)
+            {
+                if (!FilteredPinnedChats.Contains(v))
+                {
+                    //add selected chat to pin chat
+                    PinnedChats.Add(v);
+                    FilteredPinnedChats.Add(v);
+                    v.ChatIsPinned = true;
+
+                    //remove selected chat from all chats, unpinned chats
+                    Chats.Remove(v);
+                    FilteredChats.Remove(v);
+
+                    //OnPropertyChanged("PinnedChats");
+                    //OnPropertyChanged("FilteredPinnedChats");
+                    //OnPropertyChanged("Chats");
+                    //OnPropertyChanged("FilteredChats");
+                }
+            }
+        });
+        protected ICommand _unPinChatCommand;
+        public ICommand UnPinChatCommand => _unPinChatCommand ??= new RelayCommand(parameter =>
+        {
+            if (parameter is ChatListData v)
+            {
+                if (!FilteredChats.Contains(v))
+                {
+                    //add selected chat to Normal Unpinned chat list
+                    Chats.Add(v);
+                    FilteredChats.Add(v);
+
+                    //remove selected pinned chat list
+                    PinnedChats.Remove(v);
+                    FilteredPinnedChats.Remove(v);
+                    v.ChatIsPinned = false;
+
+                    //OnPropertyChanged("PinnedChats");
+                    //OnPropertyChanged("FilteredPinnedChats");
+                    //OnPropertyChanged("Chats");
+                    //OnPropertyChanged("FilteredChats");
+                }
+            }
+        });
+
         #endregion
 
         #endregion
@@ -262,6 +338,9 @@ namespace WpfChatApp.ViewModels
             LoadStatusThumbs();
             LoadChats();
             LoadChatConversation();
+
+            PinnedChats = new ObservableCollection<ChatListData>();
+
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

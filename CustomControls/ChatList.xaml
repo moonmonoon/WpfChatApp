@@ -141,7 +141,25 @@
                                                 <UniformGrid 
                                                     Grid.Column="1"
                                                     Columns="4">
-                                                    <Button Content="{StaticResource pinned}" Style="{StaticResource IconButtonStyle}"/>
+                                                    <Button CommandParameter="{Binding}">
+                                                        <!-- To show unpin icon & Command to unpin when the chat is pinned -->
+                                                        <Button.Style>
+                                                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource IconButtonStyle}">
+                                                                <!--Normal Unpinned Chat Style-->
+                                                                <Setter Property="Content" Value="{StaticResource pinned}"/>
+                                                                <Setter Property="Command" Value="{Binding DataContext.PinChatCommand, ElementName=_Chats}"/>
+
+                                                                <!--Pinned Chat Style-->
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding ChatIsPinned}" Value="True">
+                                                                        <Setter Property="Content" Value="{StaticResource unpin}"/>
+                                                                        <Setter Property="Command" Value="{Binding DataContext.UnPinChatCommand, ElementName=_Chats}"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Button.Style>
+                                                    </Button>
+                                                    
                                                     <Button Content="{StaticResource archive}" Style="{StaticResource IconButtonStyle}"/>
                                                     <Button Content="{StaticResource mute}" Style="{StaticResource IconButtonStyle}"/>
                                                     <Button Content="{StaticResource trash}" Style="{StaticResource IconButtonStyle}"/>
@@ -164,8 +182,29 @@
         <Grid Margin="25,15">
             <!-- In this usercontrol we  will list our Contact chats list -->
             <StackPanel>
+
+                <!--Pinned Chats-->
+                <StackPanel 
+                    Orientation="Horizontal">
+                    <Path 
+                        Data="{StaticResource pinned}"
+                        StrokeThickness="1"
+                        Stroke="Black"
+                        Fill="Black"/>
+                    <TextBlock
+                        Margin="10,0"
+                        Text="Pinned"
+                        FontWeight="SemiBold"
+                        VerticalAlignment="Center"/>
+                </StackPanel>
             
-                <!--Title-->
+                <!--ChatList-->
+                <ItemsControl ItemsSource="{Binding FilteredPinnedChats}"
+                              ItemTemplate="{StaticResource ChatButtonItemTemplate}"
+                              Padding="0,15">
+                </ItemsControl>
+
+                <!--All Chats-->
                 <StackPanel 
                     Orientation="Horizontal">
                     <Path 
@@ -177,14 +216,11 @@
                         FontWeight="SemiBold"
                         VerticalAlignment="Center"/>
                 </StackPanel>
-            
+
                 <!--ChatList-->
-                <ItemsControl ItemsSource="{Binding Chats}"
+                <ItemsControl ItemsSource="{Binding FilteredChats}"
                               ItemTemplate="{StaticResource ChatButtonItemTemplate}"
                               Padding="0,15">
-                    <ItemsControl.DataContext>
-                        <viewmodels:ViewModel/>
-                    </ItemsControl.DataContext>
                 </ItemsControl>
             </StackPanel>
         </Grid>
