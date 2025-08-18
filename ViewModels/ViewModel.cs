@@ -210,6 +210,16 @@ namespace WpfChatApp.ViewModels
             }
         }
 
+        protected ObservableCollection<ChatListData> _archivedChats;
+        public ObservableCollection<ChatListData> ArchivedChats
+        {
+            get => _archivedChats;
+            set
+            {
+                _archivedChats = value;
+                OnPropertyChanged();
+            }
+        }
 
         //Filtering Chats & Pinned Chats
         public ObservableCollection<ChatListData> FilteredChats { get; set; }
@@ -253,7 +263,9 @@ namespace WpfChatApp.ViewModels
         #endregion
 
         #region Commands
-        // To get the ContactName of selected chat so that we can open corresponding conversation
+        /// <summary>
+        /// To get the ContactName of selected chat so that we can open corresponding conversation
+        /// </summary>
         protected ICommand _getSelectedChatCommand;
         // ??= 구문은 c# 8 이상에서 사용 가능
         public ICommand GetSelectedChatCommand => _getSelectedChatCommand ??= new RelayCommand(parameter =>
@@ -294,7 +306,9 @@ namespace WpfChatApp.ViewModels
         //}
         #endregion
 
-        // To Pin Chat on Pin Button Click
+        /// <summary>
+        /// To Pin Chat on Pin Button Click
+        /// </summary>
         protected ICommand _pinChatCommand;
         public ICommand PinChatCommand => _pinChatCommand ??= new RelayCommand(parameter =>
         {
@@ -314,10 +328,21 @@ namespace WpfChatApp.ViewModels
                     FilteredChats.Remove(v);
                     OnPropertyChanged("Chats");
                     OnPropertyChanged("FilteredChats");
+
+
+                    // Chat will be removed from Pinned List when Archived.. and Vice Versa...
+                    // Fixed
+                    if (ArchivedChats != null)
+                    {
+                        if (ArchivedChats.Contains(v))
+                        {
+                            ArchivedChats.Remove(v);
+                            v.ChatIsArchived = false;
+                        }
+                    }
                 }
             }
         });
-
         protected ICommand _unPinChatCommand;
         public ICommand UnPinChatCommand => _unPinChatCommand ??= new RelayCommand(parameter =>
         {
@@ -341,6 +366,58 @@ namespace WpfChatApp.ViewModels
             }
         });
 
+        /// <summary>
+        /// Archive Chat Command
+        /// </summary>
+        protected ICommand _archiveChatCommand;
+        public ICommand ArchiveChatCommand => _archiveChatCommand ??= new RelayCommand(parameter =>
+        {
+            if (parameter is ChatListData v)
+            {
+                if (!ArchivedChats.Contains(v))
+                {
+                    // Chat will be removed from Pinned List when Archived.. and Vice Versa...
+
+                    //add chat in archive list
+                    ArchivedChats.Add(v);
+                    v.ChatIsArchived = true;
+                    v.ChatIsPinned = false;
+
+                    //remove chat from pinned & unpinned chat list
+                    Chats.Remove(v);
+                    FilteredChats.Remove(v);
+                    PinnedChats.Remove(v);
+                    FilteredPinnedChats.Remove(v);
+
+                    // update lists
+                    OnPropertyChanged("Chats");
+                    OnPropertyChanged("FilteredChats");
+                    OnPropertyChanged("PinnedChats");
+                    OnPropertyChanged("FilteredPinnedChats");
+                    OnPropertyChanged("ArchivedChats");
+                }
+            }
+        });
+        protected ICommand _unArchiveChatCommand;
+        public ICommand UnArchiveChatCommand => _unArchiveChatCommand ??= new RelayCommand(parameter =>
+        {
+            if (parameter is ChatListData v)
+            {
+                if (!FilteredChats.Contains(v) && !Chats.Contains(v))
+                {
+                    Chats.Add(v);
+                    FilteredChats.Add(v);
+                }
+
+                ArchivedChats.Remove(v);
+                v.ChatIsArchived = false;
+                v.ChatIsPinned = false;
+
+                OnPropertyChanged("Chats");
+                OnPropertyChanged("FilteredChats");
+                OnPropertyChanged("ArchivedChats");
+            }
+        });
         #endregion
 
         #endregion
@@ -426,6 +503,7 @@ namespace WpfChatApp.ViewModels
             LoadChatConversation();
 
             PinnedChats = new ObservableCollection<ChatListData>();
+            ArchivedChats = new ObservableCollection<ChatListData>();
 
         }
 
