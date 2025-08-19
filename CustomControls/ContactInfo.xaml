@@ -5,7 +5,32 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WpfChatApp.CustomControls"
              mc:Ignorable="d"
+             Width="0"
              MaxWidth="406">
+    <UserControl.Style>
+        <!-- To hide ContactInfo on startup and open only when the conversation contact is selected -->
+        <Style TargetType="{x:Type UserControl}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsContactInfoOpen, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                    <!-- animate -->
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard SpeedRatio="4" AccelerationRatio=".8">
+                                <DoubleAnimation Storyboard.TargetProperty="Width" From="0" To="406"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard SpeedRatio="4" DecelerationRatio="1">
+                                <DoubleAnimation Storyboard.TargetProperty="Width" From="406" To="0"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Style>
     <UserControl.Resources>
         <Style x:Key="MediaButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="105"/>
@@ -42,6 +67,7 @@
         <Button
             Margin="15,0"
             HorizontalAlignment="Left"
+            Command="{Binding CloseContactInfoCommand}"
             Content="{StaticResource close}"
             Style="{StaticResource IconButtonStyle}"/>
 

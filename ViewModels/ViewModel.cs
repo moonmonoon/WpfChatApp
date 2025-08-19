@@ -736,6 +736,61 @@ namespace WpfChatApp.ViewModels
         #endregion
         #endregion
 
+        #region ContactInfo
+
+        #region Properties
+
+        protected bool _isContactInfoOpen;
+        public bool IsContactInfoOpen
+        {
+            get => _isContactInfoOpen;
+            set
+            {
+                _isContactInfoOpen = value;
+                OnPropertyChanged("IsContactInfoOpen");
+            }
+        }
+        #endregion
+
+        #region Logics
+
+        public void OpenContactInfo() => IsContactInfoOpen = true;
+        public void CloseContactInfo() => IsContactInfoOpen = false;
+        #endregion
+
+        #region Commands
+
+        protected ICommand _openContactInfoCommand;
+        public ICommand OpenContactInfoCommand
+        {
+            get
+            {
+                if (_openContactInfoCommand == null)
+                    _openContactInfoCommand = new CommandViewModel(OpenContactInfo);
+                return _openContactInfoCommand;
+            }
+            set
+            {
+                _openContactInfoCommand = value;
+            }
+        }
+        protected ICommand _closeContactInfoCommand;
+        public ICommand CloseContactInfoCommand
+        {
+            get
+            {
+                if (_closeContactInfoCommand == null)
+                    _closeContactInfoCommand = new CommandViewModel(CloseContactInfo);
+                return _closeContactInfoCommand;
+            }
+            set
+            {
+                _closeContactInfoCommand = value;
+            }
+        }
+
+        #endregion
+        #endregion
         // using database containing contact details & conversations
         SqlConnection connection = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=D:\MoonMoNoon\WPF\WpfChatApp\Database\Database1.mdf;Integrated Security=True");
 
