@@ -459,6 +459,26 @@ namespace WpfChatApp.ViewModels
                 OnPropertyChanged("MessageText");
             }
         }
+
+        protected string LastSearchConversationText;
+        protected string mSearchConversationText;
+        public string SearchConversationText
+        {
+            get => mSearchConversationText;
+            set
+            {
+                //checked if value is different
+                if (mSearchConversationText == value)
+                    return;
+
+                //update value
+                mSearchConversationText = value;
+
+                //if search text is empty restore messages
+                if (string.IsNullOrEmpty(SearchConversationText))
+                    SearchInConversation();
+            }
+        }
         #endregion
 
         #region Logics
@@ -472,6 +492,7 @@ namespace WpfChatApp.ViewModels
                 Conversations = new ObservableCollection<ChatConversation>();
 
             Conversations.Clear();
+            FilteredConversations.Clear();
             using (SqlCommand com = new SqlCommand("select * from conversations where ContactName=@ContactName", connection))
             {
                 com.Parameters.AddWithValue("@ContactName", chat.ContactName);
@@ -497,13 +518,61 @@ namespace WpfChatApp.ViewModels
 
                         Conversations.Add(conversation);
                         OnPropertyChanged("Conversations");
+                        FilteredConversations.Add(conversation);
+                        OnPropertyChanged("FilteredConversations");
                     }
                 }
             }
         }
 
+        void SearchInConversation()
+        {
+            //to avoid re-searching same text again
+            if ((string.IsNullOrEmpty(LastSearchConversationText) && string.IsNullOrEmpty(SearchConversationText)) || string.Equals(LastSearchConversationText, SearchConversationText))
+                return;
+
+            if (string.IsNullOrEmpty(SearchConversationText) || Conversations == null || Conversations.Count <= 0)
+            {
+                FilteredConversations = new ObservableCollection<ChatConversation>(Conversations ?? Enumerable.Empty<ChatConversation>());
+                OnPropertyChanged("FilteredConversations");
+
+                //update last search text
+                LastSearchConversationText = SearchConversationText;
+
+                return;
+            }
+
+            //to find all Conversations that contain the text in our search box
+            FilteredConversations = new ObservableCollection<ChatConversation>(
+                Conversations.Where(
+                    chat => chat.ReceivedMessage.ToLower().Contains(SearchConversationText) // if ReceivedMessage contains SearchConversationText then add it in filtered chat list
+                            || 
+                            chat.SentMessage.ToLower().Contains(SearchConversationText) // if SentMessage contains SearchConversationText then add it in filtered chat list
+                            )
+                );
+            OnPropertyChanged("FilteredConversations");
+
+            //update last search text
+            LastSearchConversationText = SearchConversationText;
+        }
         #endregion
 
+        #region Commands
+        protected ICommand _searchConversationCommand;
+        public ICommand SearchConversationCommand
+        {
+            get
+            {
+                if (_searchConversationCommand == null)
+                    _searchConversationCommand = new CommandViewModel(SearchInConversation);
+                return _searchConversationCommand;
+            }
+            set
+            {
+                _searchConversationCommand = value;
+            }
+        }
+        #endregion
         #endregion
 
         // using database containing contact details & conversations

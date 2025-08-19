@@ -165,24 +165,30 @@
         </Grid.RowDefinitions>
 
         <!--Searchbox Row-->
-        <Border Grid.Row="1"
-                Background="#dce1de"
-                CornerRadius="15"
-                Margin="20,20,20,20"
-                Height="50"
-                x:Name="searchBoxBorder"
-                FocusManager.FocusedElement="{Binding ElementName=searchQuery}" Grid.ColumnSpan="2">
+        <Border 
+            Background="#dce1de"
+            CornerRadius="15"
+            Margin="20"
+            Height="50"
+            x:Name="searchBoxBorder"
+            FocusManager.FocusedElement="{Binding ElementName=searchQuery}" >
 
             <!--FocusManager.FocusedElement="{Binding ElementName=searchQuery}"
                             => to focus our textbox when border gets focused...-->
-            <TextBox Name="searchQuery"
-                    Padding="12,0"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    VerticalAlignment="Stretch"
-                    VerticalContentAlignment="Center"
-                    Text="Search Text"
-                    />
+            <TextBox
+                 Name="searchQuery"
+                 Padding="12,0"
+                 Background="Transparent"
+                 BorderThickness="0"
+                 VerticalAlignment="Stretch"
+                 VerticalContentAlignment="Center"
+                 Text="{Binding SearchConversationText, UpdateSourceTrigger=PropertyChanged}">
+                <!--key Binding to search on 'Enter' key press-->
+                <TextBox.InputBindings>
+                    <KeyBinding Command="{Binding SearchConversationCommand}" Key="Return"/>
+                </TextBox.InputBindings>
+            </TextBox>
+
         </Border>
 
         <!--Body-->
@@ -192,7 +198,7 @@
             HorizontalScrollBarVisibility="Disabled"
             Grid.Row="1">
             <ItemsControl
-                ItemsSource="{Binding Conversations, UpdateSourceTrigger=PropertyChanged}"
+                ItemsSource="{Binding FilteredConversations, UpdateSourceTrigger=PropertyChanged}"
                 ItemTemplate="{StaticResource ItemTemplate}"
                 Margin="15,0,0,0"
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
