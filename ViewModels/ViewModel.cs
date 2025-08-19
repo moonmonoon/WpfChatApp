@@ -279,6 +279,8 @@ namespace WpfChatApp.ViewModels
                 //getting contactphoto from selected chat
                 ContactPhoto = v.ContactPhoto;
                 OnPropertyChanged("ContactPhoto");
+
+                LoadChatConversation(v);
             }
         });
         #region - c# 7.3 버전 코드
@@ -432,10 +434,20 @@ namespace WpfChatApp.ViewModels
             get => mConversations;
             set
             {
+                //To Change the list
+                if (mConversations == value)
+                    return;
+
+                //To Update the list
                 mConversations = value;
+
+                //Updating filtered pinned chats to match
+                FilteredConversations = new ObservableCollection<ChatConversation>(mConversations);
                 OnPropertyChanged("Conversations");
+                OnPropertyChanged("FilteredConversations");
             }
         }
+        public ObservableCollection<ChatConversation> FilteredConversations { get; set; }
 
         protected string messageText;
         public string MessageText
@@ -451,7 +463,7 @@ namespace WpfChatApp.ViewModels
 
         #region Logics
 
-        void LoadChatConversation()
+        void LoadChatConversation(ChatListData chat)
         {
             if (connection.State == System.Data.ConnectionState.Closed)
                 connection.Open();
@@ -460,8 +472,9 @@ namespace WpfChatApp.ViewModels
                 Conversations = new ObservableCollection<ChatConversation>();
 
             Conversations.Clear();
-            using (SqlCommand com = new SqlCommand("select * from conversations where ContactName='Mike'", connection))
+            using (SqlCommand com = new SqlCommand("select * from conversations where ContactName=@ContactName", connection))
             {
+                com.Parameters.AddWithValue("@ContactName", chat.ContactName);
                 using (SqlDataReader reader = com.ExecuteReader())
                 {
                     while (reader.Read())
@@ -500,7 +513,6 @@ namespace WpfChatApp.ViewModels
         {
             LoadStatusThumbs();
             LoadChats();
-            LoadChatConversation();
 
             PinnedChats = new ObservableCollection<ChatListData>();
             ArchivedChats = new ObservableCollection<ChatListData>();
