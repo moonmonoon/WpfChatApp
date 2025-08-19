@@ -166,6 +166,7 @@
                     <Button 
                         Grid.Column="2"
                         x:Name="btnChatSearchButton"
+                        Command="{Binding OpenSearchCommand}"
                         Content="{StaticResource search}"
                         Style="{StaticResource IconButtonStyle}"/>
 
@@ -180,15 +181,28 @@
                 <!--1.2.SearchBox-->
                 <!-- To-Do: Add Search Box open/close and hide/unhide Triggers -->
                 <Border Grid.Row="1"
+                    Grid.ColumnSpan="2"
                     Background="#dce1de"
                     CornerRadius="15"
                     Margin="20,20,20,20"
                     Height="50"
                     x:Name="searchBoxBorder"
-                    FocusManager.FocusedElement="{Binding ElementName=searchQuery}" Grid.ColumnSpan="2">
-
+                    FocusManager.FocusedElement="{Binding ElementName=searchQuery}">
                     <!--FocusManager.FocusedElement="{Binding ElementName=searchQuery}"
                         => to focus our textbox when border gets focused...-->
+
+                    <!-- Hide Searchbox when no text -->
+                    <Border.Style>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSearchBoxOpen, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=False}"
+                                             Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
                     <TextBox
                         Name="searchQuery"
                         Padding="12,0"
@@ -197,9 +211,11 @@
                         VerticalAlignment="Stretch"
                         VerticalContentAlignment="Center"
                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}">
-                        <!--key Binding to search on 'Enter' key press-->
                         <TextBox.InputBindings>
+                            <!--key Binding to Search on 'Enter' key press-->
                             <KeyBinding Command="{Binding SearchCommand}" Key="Return"/>
+                            <!--key Binding to Clear on 'ESC' key press-->
+                            <KeyBinding Command="{Binding ClearSearchCommand}" Key="Esc"/>
                         </TextBox.InputBindings>
                     </TextBox>
                 </Border>
@@ -258,6 +274,7 @@
                     
                     <!--Search button-->
                     <Button Grid.Column="3"
+                            Command="{Binding OpenConversationSearchCommand}"
                             Content="{StaticResource search}"
                             Style="{StaticResource IconButtonStyle}"/>
                     

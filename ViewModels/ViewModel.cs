@@ -24,6 +24,25 @@ namespace WpfChatApp.ViewModels
         public string LastSeen { get; set; }
 
         #region Search Chats
+        protected bool _isSearchBoxOpen;
+        public bool IsSearchBoxOpen
+        {
+            get => _isSearchBoxOpen;
+            set
+            {
+                if (_isSearchBoxOpen == value) return;
+
+                _isSearchBoxOpen = value;
+
+                if (_isSearchBoxOpen == false)
+                {
+                    // clear search box
+                    SearchText = string.Empty;
+                }
+
+                OnPropertyChanged("IsSearchBoxOpen");
+            }
+        }
         protected string LastSearchText { get; set; }
         protected string mSearchText { get; set; }
         public string SearchText
@@ -41,12 +60,28 @@ namespace WpfChatApp.ViewModels
                 //if search text is empty restore messages
                 if (string.IsNullOrEmpty(SearchText))
                     Search();
+
+                OnPropertyChanged("SearchText");
             }
         }
         #endregion
         #endregion
 
         #region Logics
+        public void OpenSearchBox()
+        {
+            IsSearchBoxOpen = true;
+        }
+        public void CloseSearchBox() => IsSearchBoxOpen = false;
+
+        public void ClearSearchBox()
+        {
+            if (!string.IsNullOrEmpty(SearchText))
+                SearchText = string.Empty;
+            else
+                CloseSearchBox();
+        }
+
         public void Search()
         {
             //to avoid re-searching same text again
@@ -93,6 +128,51 @@ namespace WpfChatApp.ViewModels
         #endregion
 
         #region Commands
+        protected ICommand _openSearchCommand;
+        public ICommand OpenSearchCommand
+        {
+            get
+            {
+                if (_openSearchCommand == null)
+                    _openSearchCommand = new CommandViewModel(OpenSearchBox);
+                return _openSearchCommand;
+            }
+            set
+            {
+                _openSearchCommand = value;
+            }
+        }
+
+        protected ICommand _closeSearchCommand;
+        public ICommand CloseSearchCommand
+        {
+            get
+            {
+                if (_closeSearchCommand == null)
+                    _closeSearchCommand = new CommandViewModel(CloseSearchBox);
+                return _closeSearchCommand;
+            }
+            set
+            {
+                _closeSearchCommand = value;
+            }
+        }
+
+        protected ICommand _clearSearchCommand;
+        public ICommand ClearSearchCommand
+        {
+            get
+            {
+                if (_clearSearchCommand == null)
+                    _clearSearchCommand = new CommandViewModel(ClearSearchBox);
+                return _clearSearchCommand;
+            }
+            set
+            {
+                _clearSearchCommand = value;
+            }
+        }
+
         protected ICommand _searchCommand;
         public ICommand SearchCommand
         {
@@ -460,6 +540,25 @@ namespace WpfChatApp.ViewModels
             }
         }
 
+        protected bool _isConversationSearchBoxOpen;
+        public bool IsConversationSearchBoxOpen
+        {
+            get => _isConversationSearchBoxOpen;
+            set
+            {
+                if (_isConversationSearchBoxOpen == value) return;
+
+                _isConversationSearchBoxOpen = value;
+
+                if (_isConversationSearchBoxOpen == false)
+                {
+                    // clear search box
+                    SearchConversationText = string.Empty;
+                }
+
+                OnPropertyChanged("IsConversationSearchBoxOpen");
+            }
+        }
         protected string LastSearchConversationText;
         protected string mSearchConversationText;
         public string SearchConversationText
@@ -477,11 +576,27 @@ namespace WpfChatApp.ViewModels
                 //if search text is empty restore messages
                 if (string.IsNullOrEmpty(SearchConversationText))
                     SearchInConversation();
+
+                OnPropertyChanged("SearchConversationText");
             }
         }
         #endregion
 
         #region Logics
+        public void OpenConversationSearchBox()
+        {
+            IsConversationSearchBoxOpen = true;
+        }
+        public void CloseConversationSearchBox() => IsConversationSearchBoxOpen = false;
+
+        public void ClearConversationSearchBox()
+        {
+            if (!string.IsNullOrEmpty(SearchConversationText))
+                SearchConversationText = string.Empty;
+            else
+                CloseConversationSearchBox();
+        }
+
 
         void LoadChatConversation(ChatListData chat)
         {
@@ -558,6 +673,52 @@ namespace WpfChatApp.ViewModels
         #endregion
 
         #region Commands
+
+        protected ICommand _openConversationSearchCommand;
+        public ICommand OpenConversationSearchCommand
+        {
+            get
+            {
+                if (_openConversationSearchCommand == null)
+                    _openConversationSearchCommand = new CommandViewModel(OpenConversationSearchBox);
+                return _openConversationSearchCommand;
+            }
+            set
+            {
+                _openConversationSearchCommand = value;
+            }
+        }
+
+        protected ICommand _closeConversationSearchCommand;
+        public ICommand CloseConversationSearchCommand
+        {
+            get
+            {
+                if (_closeConversationSearchCommand == null)
+                    _closeConversationSearchCommand = new CommandViewModel(CloseConversationSearchBox);
+                return _closeConversationSearchCommand;
+            }
+            set
+            {
+                _closeConversationSearchCommand = value;
+            }
+        }
+
+        protected ICommand _clearConversationSearchCommand;
+        public ICommand ClearConversationSearchCommand
+        {
+            get
+            {
+                if (_clearConversationSearchCommand == null)
+                    _clearConversationSearchCommand = new CommandViewModel(ClearConversationSearchBox);
+                return _clearConversationSearchCommand;
+            }
+            set
+            {
+                _clearConversationSearchCommand = value;
+            }
+        }
+
         protected ICommand _searchConversationCommand;
         public ICommand SearchConversationCommand
         {

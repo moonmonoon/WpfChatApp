@@ -173,6 +173,20 @@
             x:Name="searchBoxBorder"
             FocusManager.FocusedElement="{Binding ElementName=searchQuery}" >
 
+
+            <!-- Hide ConversationSearchbox when no text -->
+            <Border.Style>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsConversationSearchBoxOpen, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=False}"
+                                             Value="True">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            
             <!--FocusManager.FocusedElement="{Binding ElementName=searchQuery}"
                             => to focus our textbox when border gets focused...-->
             <TextBox
@@ -186,6 +200,9 @@
                 <!--key Binding to search on 'Enter' key press-->
                 <TextBox.InputBindings>
                     <KeyBinding Command="{Binding SearchConversationCommand}" Key="Return"/>
+
+                    <!--key Binding to Clear on 'ESC' key press-->
+                    <KeyBinding Command="{Binding ClearConversationSearchCommand}" Key="Esc"/>
                 </TextBox.InputBindings>
             </TextBox>
 
